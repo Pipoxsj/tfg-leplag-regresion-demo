@@ -114,7 +114,7 @@ El dataset (`data/dataset_complementario_regresion_anonimizado-2.csv`) contiene 
 ---
 ## 🎥 Video demo 
 
-El video de demostración (3–5 minutos) del prototipo está disponible en el siguiente enlace:
+El video de demostración del prototipo está disponible en el siguiente enlace:
 
 👉 [Ver video demo](https://docs.google.com/videos/d/1nBcodtw41iR3uLrHqs6swiHNwT7i_c-rtLHMSomg0Bo/edit?usp=sharing)
 
