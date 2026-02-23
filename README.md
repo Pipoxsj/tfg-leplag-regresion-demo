@@ -112,7 +112,7 @@ El dataset (`data/dataset_complementario_regresion_anonimizado-2.csv`) contiene 
 | `monto_mensual_ars`    | float        | **Variable objetivo**: monto facturado (ARS)     |
 
 ---
-## 🎥 Video demo del sistema
+## 🎥 Video demo 
 
 El video de demostración (3–5 minutos) del prototipo está disponible en el siguiente enlace:
 
