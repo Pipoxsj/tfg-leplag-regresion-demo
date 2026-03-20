@@ -1,0 +1,6 @@
+tecnico_id,tecnico_nombre,activo,fuente,observacion
+TEC-000,TECNICO_000,TRUE,FusionWEB_tecnicos_manual,Registro manual a partir de pantalla de tecnicos
+TEC-001,TECNICO_001,TRUE,FusionWEB_tecnicos_manual,Registro manual a partir de pantalla de tecnicos
+TEC-002,TECNICO_002,TRUE,FusionWEB_tecnicos_manual,Registro manual a partir de pantalla de tecnicos
+TEC-003,TECNICO_003,TRUE,FusionWEB_tecnicos_manual,Registro manual a partir de pantalla de tecnicos
+TEC-004,TECNICO_004,TRUE,FusionWEB_tecnicos_manual,Registro manual a partir de pantalla de tecnicos
