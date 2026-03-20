@@ -5,7 +5,8 @@ Carga inicial de fuentes sanitizadas del prototipo de integración,
 trazabilidad y analítica complementaria a FusionWEB.
 
 Fuentes esperadas en data/raw/:
-- clientes_fusionweb.csv
+- clientes_fusionweb_compatible.csv (preferida)
+- clientes_fusionweb.csv (respaldo)
 - servicios_u_ot_fusionweb.csv
 - tecnicos_complementario.csv
 
@@ -20,11 +21,10 @@ Esta versión prioriza:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, Iterable
+from typing import Dict
 
 import pandas as pd
 
-# Raíz del proyecto: src/ingest/loaders.py -> ../../
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 RAW_DIR = PROJECT_ROOT / "data" / "raw"
 
@@ -34,7 +34,8 @@ class LoaderError(Exception):
 
 
 EXPECTED_FILES = {
-    "clientes": RAW_DIR / "clientes_fusionweb.csv",
+    "clientes": RAW_DIR / "clientes_fusionweb_compatible.csv",
+    "clientes_fallback": RAW_DIR / "clientes_fusionweb.csv",
     "servicios": RAW_DIR / "servicios_u_ot_fusionweb.csv",
     "tecnicos": RAW_DIR / "tecnicos_complementario.csv",
 }
@@ -57,7 +58,6 @@ REQUIRED_COLUMNS = {
 
 
 def standardize_column_name(name: str) -> str:
-    """Estandariza nombres de columnas para facilitar validación y joins."""
     return (
         str(name)
         .strip()
@@ -68,19 +68,15 @@ def standardize_column_name(name: str) -> str:
     )
 
 
-
 def standardize_columns(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df.columns = [standardize_column_name(col) for col in df.columns]
     return df
 
 
-
 def clean_text_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """Limpieza mínima de campos string sin forzar catálogos todavía."""
     df = df.copy()
     object_cols = df.select_dtypes(include=["object", "string"]).columns
-
     for col in object_cols:
         df[col] = (
             df[col]
@@ -88,13 +84,10 @@ def clean_text_columns(df: pd.DataFrame) -> pd.DataFrame:
             .str.strip()
             .str.replace(r"\s+", " ", regex=True)
         )
-
     return df
 
 
-
 def read_csv_safe(path: Path, sep: str = ",") -> pd.DataFrame:
-    """Lee un CSV con configuración tolerante a archivos operativos."""
     if not path.exists():
         raise LoaderError(f"No se encontró el archivo esperado: {path}")
 
@@ -108,7 +101,6 @@ def read_csv_safe(path: Path, sep: str = ",") -> pd.DataFrame:
     return df
 
 
-
 def validate_required_columns(df: pd.DataFrame, source_name: str) -> None:
     required = REQUIRED_COLUMNS[source_name]
     missing = [col for col in required if col not in df.columns]
@@ -118,12 +110,10 @@ def validate_required_columns(df: pd.DataFrame, source_name: str) -> None:
         )
 
 
-
 def log_load_summary(df: pd.DataFrame, source_name: str) -> None:
     print(
         f"[LOAD OK] {source_name}: filas={len(df)}, columnas={len(df.columns)} -> {list(df.columns)}"
     )
-
 
 
 def base_load(path: Path, source_name: str) -> pd.DataFrame:
@@ -135,39 +125,38 @@ def base_load(path: Path, source_name: str) -> pd.DataFrame:
     return df
 
 
+def resolve_clientes_path(path: Path | None = None) -> Path:
+    if path is not None:
+        return path
+    if EXPECTED_FILES["clientes"].exists():
+        return EXPECTED_FILES["clientes"]
+    return EXPECTED_FILES["clientes_fallback"]
+
 
 def load_clientes(path: Path | None = None) -> pd.DataFrame:
-    """Carga la dimensión de clientes."""
-    path = path or EXPECTED_FILES["clientes"]
+    path = resolve_clientes_path(path)
     df = base_load(path, "clientes")
 
-    # Conversión liviana de tipos
     if "cliente_numero" in df.columns:
         df["cliente_numero"] = pd.to_numeric(df["cliente_numero"], errors="coerce")
 
     return df
 
 
-
 def load_servicios(path: Path | None = None) -> pd.DataFrame:
-    """Carga la tabla base de órdenes de trabajo / servicios."""
     path = path or EXPECTED_FILES["servicios"]
     df = base_load(path, "servicios")
 
-    # Genera un identificador técnico si aún no existe uno estable
     if "servicio_id" not in df.columns:
         df.insert(0, "servicio_id", [f"SERV-{i+1:04d}" for i in range(len(df))])
 
-    # Normalización liviana de estados
     if "estado_servicio" in df.columns:
         df["estado_servicio"] = df["estado_servicio"].str.upper()
 
     return df
 
 
-
 def load_tecnicos(path: Path | None = None) -> pd.DataFrame:
-    """Carga la dimensión de técnicos."""
     path = path or EXPECTED_FILES["tecnicos"]
     df = base_load(path, "tecnicos")
 
@@ -183,9 +172,7 @@ def load_tecnicos(path: Path | None = None) -> pd.DataFrame:
     return df
 
 
-
 def load_all_sources() -> Dict[str, pd.DataFrame]:
-    """Carga todas las fuentes mínimas del prototipo."""
     return {
         "clientes": load_clientes(),
         "servicios": load_servicios(),
@@ -193,17 +180,14 @@ def load_all_sources() -> Dict[str, pd.DataFrame]:
     }
 
 
-
 def print_basic_diagnostics(dataframes: Dict[str, pd.DataFrame]) -> None:
-    """Muestra diagnósticos rápidos para verificar consistencia inicial."""
     print("\n=== DIAGNÓSTICO BÁSICO DE FUENTES ===")
     for name, df in dataframes.items():
         print(f"\nFuente: {name}")
         print(f"- Filas: {len(df)}")
         print(f"- Columnas: {len(df.columns)}")
-        print(f"- Nulos por columna:")
+        print("- Nulos por columna:")
         print(df.isna().sum())
-
 
 
 def validate_cross_source_consistency(
@@ -211,7 +195,6 @@ def validate_cross_source_consistency(
     servicios: pd.DataFrame,
     tecnicos: pd.DataFrame,
 ) -> None:
-    """Chequeos mínimos entre tablas para detectar inconsistencias tempranas."""
     print("\n=== VALIDACIÓN CRUZADA BÁSICA ===")
 
     client_ids_in_servicios = set(servicios["cliente_id"].dropna().unique())
@@ -229,9 +212,7 @@ def validate_cross_source_consistency(
         print(f"  Ejemplos: {missing_tecnico_ids[:10]}")
 
 
-
 def run_initial_load() -> Dict[str, pd.DataFrame]:
-    """Pipeline mínimo de carga para pruebas rápidas desde consola."""
     dataframes = load_all_sources()
     print_basic_diagnostics(dataframes)
     validate_cross_source_consistency(
