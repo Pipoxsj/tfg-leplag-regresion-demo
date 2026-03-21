@@ -10,7 +10,13 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 DB_PATH = PROJECT_ROOT / 'data' / 'processed' / 'leplag.duckdb'
 
 
-@st.cache_data
+try:
+    cache_data = st.cache_data
+except AttributeError:
+    cache_data = st.cache
+
+
+@cache_data
 def load_summary_data() -> dict[str, pd.DataFrame]:
     if not DB_PATH.exists():
         raise FileNotFoundError(f'No se encontró la base DuckDB en: {DB_PATH}')
