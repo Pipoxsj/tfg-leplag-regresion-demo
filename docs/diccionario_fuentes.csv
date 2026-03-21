@@ -1,0 +1,47 @@
+fuente,nombre_original,nombre_canonico,tipo_esperado,obligatoria,regla_limpieza,ejemplo,observacion
+clientes_fusionweb,ID Cliente,cliente_id,string,si,trim|upper,C001,Clave primaria del cliente
+clientes_fusionweb,Cliente,cliente_nombre,string,si,trim|title,Ministerio de Producción,Nombre visible del cliente
+clientes_fusionweb,CUIT,cuit,string,no,trim|digits_only,30712345678,Puede faltar o venir con guiones
+clientes_fusionweb,Dirección,direccion,string,no,trim|title,Av. Libertador 1234,Normalizar abreviaturas si aplica
+clientes_fusionweb,Teléfono,telefono,string,no,trim|digits_only,2641234567,Puede contener espacios o símbolos
+clientes_fusionweb,Zona,zona,string,no,trim|upper,RAWSON,Catálogo geográfico
+servicios_u_ot_fusionweb,ID Servicio,servicio_id,string,si,trim|upper,SERV001,Clave principal del servicio
+servicios_u_ot_fusionweb,ID Cliente,cliente_id,string,si,trim|upper,C001,Debe vincular con clientes
+servicios_u_ot_fusionweb,Fecha Programada,fecha_programada,date,si,parse_date,2026-03-20,Fecha comprometida
+servicios_u_ot_fusionweb,Fecha Ejecución,fecha_ejecucion,date,no,parse_date,2026-03-20,Puede ser nula si no se ejecutó
+servicios_u_ot_fusionweb,Estado,estado_servicio,string,si,trim|upper|map_catalog,FINALIZADO,Normalizar catálogo de estados
+servicios_u_ot_fusionweb,Tipo Servicio,tipo_servicio,string,si,trim|upper|map_catalog,DESINSECTACION,Normalizar catálogo
+servicios_u_ot_fusionweb,ID Técnico,tecnico_id,string,no,trim|upper,T001,Puede faltar en servicios no asignados
+servicios_u_ot_fusionweb,Observaciones,observaciones,string,no,trim,Servicio reprogramado por lluvia,Campo libre
+cronograma_fusionweb,ID Evento,evento_id,string,si,trim|upper,EV001,Identificador de agenda
+cronograma_fusionweb,ID Servicio,servicio_id,string,no,trim|upper,SERV001,Permite conciliar con OT
+cronograma_fusionweb,ID Técnico,tecnico_id,string,no,trim|upper,T001,Vincula asignación
+cronograma_fusionweb,Fecha,fecha_programada,date,si,parse_date,2026-03-20,Fecha del bloque
+cronograma_fusionweb,Hora Inicio,hora_inicio,string,no,trim,08:00,Puede parsearse luego
+cronograma_fusionweb,Hora Fin,hora_fin,string,no,trim,10:00,Puede parsearse luego
+cronograma_fusionweb,Estado Programación,estado_programacion,string,no,trim|upper,ASIGNADO,Catálogo de agenda
+productos_fusionweb,ID Producto,producto_id,string,si,trim|upper,P001,Clave del insumo
+productos_fusionweb,Producto,producto_nombre,string,si,trim|upper,CIPERMETRINA,Normalizar nombre
+productos_fusionweb,Principio Activo,principio_activo,string,no,trim|upper,CIPERMETRINA,Puede repetirse entre productos
+productos_fusionweb,Certificación,certificacion,string,no,trim|upper,SENASA,Campo documental
+productos_fusionweb,Precio,precio,float,no,parse_float,12500.0,Homologar separadores decimales
+productos_fusionweb,Proveedor,proveedor,string,no,trim|title,Laboratorios X,Dimensión opcional
+tecnicos_complementario,ID Técnico,tecnico_id,string,si,trim|upper,T001,Clave del técnico
+tecnicos_complementario,Técnico,tecnico_nombre,string,si,trim|title,Jonathan Naranjo,Nombre visible
+tecnicos_complementario,Rol,rol,string,no,trim|upper,OPERATIVO,Catálogo de funciones
+tecnicos_complementario,Activo,activo,bool,no,parse_bool,TRUE,Indica disponibilidad
+certificados_complementario,ID Certificado,certificado_id,string,si,trim|upper,CERT001,Clave documental
+certificados_complementario,ID Servicio,servicio_id,string,si,trim|upper,SERV001,Vincula certificado con servicio
+certificados_complementario,Fecha Certificado,fecha_certificado,date,no,parse_date,2026-03-20,Fecha documental
+certificados_complementario,Estado Certificado,estado_certificado,string,si,trim|upper|map_catalog,EMITIDO,Normalizar estados documentales
+certificados_complementario,Observaciones,observaciones,string,no,trim,Firma pendiente,Comentario libre
+dataset_regresion,id_cliente_anon,id_cliente_anon,int,si,identity,1001,Identificador anonimizado
+dataset_regresion,zona,zona,string,si,trim|upper,RAWSON,Variable categórica
+dataset_regresion,tipo_cliente,tipo_cliente,string,si,trim|upper,COMERCIAL,Variable categórica
+dataset_regresion,mes,mes,int,si,parse_int,3,Mes calendario
+dataset_regresion,tipo_servicio,tipo_servicio,string,si,trim|upper,DESRATIZACION,Variable categórica
+dataset_regresion,superficie_m2,superficie_m2,float,si,parse_float,150.5,Variable numérica
+dataset_regresion,distancia_km,distancia_km,float,si,parse_float,12.3,Variable numérica
+dataset_regresion,tecnico_id,tecnico_id,int,no,parse_int,2,Puede tratarse aparte
+dataset_regresion,servicios_mes,servicios_mes,int,si,parse_int,8,Variable numérica
+dataset_regresion,monto_mensual_ars,monto_mensual_ars,float,si,parse_float,85000.0,Variable objetivo

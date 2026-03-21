@@ -1,0 +1,15 @@
+col_c,col_i,horario,origen,estado_servicio,tecnico_id,cliente_id,sucursal_id,direccion_id,servicios,consumo
+,,09:00 hs,+ servicios,Finalizado,TEC-001,CLI-001,SUC-001,DIR-001,Desinsectación,0
+,,10:00 hs,+ servicios,Finalizado,TEC-001,CLI-002,SUC-002,DIR-002,Desratización,0
+,,12:00 hs,+ servicios,Finalizado,TEC-001,CLI-003,SUC-003,DIR-003,Desratización,0
+,,13:15 hs,+ servicios,Finalizado,TEC-001,CLI-004,SUC-004,DIR-004,Desinsectación,0
+,,15:00 hs,+ servicios,Finalizado,TEC-001,CLI-005,SUC-001,DIR-005,Desinsectación,0
+,,16:00 hs,+ servicios,Pendiente,TEC-002,CLI-006,SUC-005,DIR-006,"Desratización ,Desinsectación",0
+,,16:00 hs,+ servicios,Finalizado,TEC-001,CLI-007,SUC-006,DIR-007,Desinsectación,0
+,,17:30 hs,+ servicios,Pendiente,TEC-002,CLI-008,SUC-007,DIR-008,Desratización,0
+,,18:00 hs,+ servicios,Pendiente,TEC-003,CLI-009,SUC-008,DIR-009,"Desinsectación ,Desratización",0
+,,18:30 hs,+ servicios,Finalizado,TEC-004,CLI-010,SUC-009,DIR-010,Desratización,0
+,,19:00 hs,+ servicios,Finalizado,TEC-004,CLI-011,SUC-010,DIR-011,"Desinsectación ,Desratización",0
+,,20:00 hs,+ servicios,Finalizado,TEC-003,CLI-012,SUC-011,DIR-012,Desinsectación,0
+,,20:30 hs,+ servicios,Pendiente,TEC-002,CLI-013,SUC-012,DIR-013,"Desratización ,Desinsectación",0
+,,21:00 hs,+ servicios,Finalizado,TEC-001,CLI-014,SUC-013,DIR-014,Desratización,0
