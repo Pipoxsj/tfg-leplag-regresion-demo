@@ -1,190 +1,174 @@
-# TFG Leplag Fumigaciones - Demo Regresión Múltiple
+# TFG Leplag Fumigaciones - MVP de integración, trazabilidad y analítica
 
-Repositorio demo del **Trabajo Final de Grado** de Ricardo Landa: _Transformación digital orientada a datos en Leplag Fumigaciones_.
+Repositorio de trabajo del TFG de Ricardo Landa sobre transformación digital orientada a datos en Leplag Fumigaciones.
 
-Este repositorio reproduce el pipeline de regresión lineal múltiple para predecir `monto_mensual_ars` a partir de variables operativas (superficie, distancia, mes, tipo de cliente, etc.).
+Este proyecto implementa un MVP funcional complementario a FusionWEB para integrar datos operativos, construir trazabilidad de servicios, evaluar calidad de datos y exponer una prueba de concepto analítica reproducible.
 
----
+## Qué incluye
 
-## 📋 Características
+- ingesta de fuentes sanitizadas de clientes, servicios y técnicos
+- base local DuckDB para consulta y análisis
+- vistas de trazabilidad operativa
+- normalización de tipos de servicio
+- reglas de calidad de datos
+- dashboard y páginas de consulta en Streamlit
+- componente analítico con una PoC de regresión múltiple
 
-- **Pipeline completo**: carga de datos, preprocesamiento con `ColumnTransformer`, entrenamiento con `LinearRegression` de scikit-learn.
-- **Métricas**: MAE, RMSE, R².
-- **Visualización**: gráfico scatter de valores reales vs. predichos.
-- **Reproducibilidad**: `random_state=42` fijado en train/test split.
-- **Ejecutable en**:
-  - **Google Colab** (1-click).
-  - **Entorno local** (Python 3.8+).
+## Componentes principales
 
----
+### Datos e integración
+- `src/ingest/loaders.py`
+- `src/ingest/run_ingest.py`
 
-## 🚀 Ejecución en Google Colab (Recomendado)
+### Base y trazabilidad
+- `src/db/build_db.py`
+- `src/db/build_db_normalized.py`
 
-1. Abre el notebook directamente en Colab haciendo clic aquí:  
-   [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Pipoxsj/tfg-leplag-regresion-demo/blob/main/notebooks/demo_regresion_leplag.ipynb)
+### Calidad de datos
+- `src/quality/rules.py`
+- `src/quality/run_quality.py`
 
-2. El notebook descargará automáticamente el dataset desde el repo (o puedes subirlo manualmente).
+### Normalización
+- `src/transform/normalize.py`
 
-3. Ejecuta todas las celdas (`Runtime > Run all`).
+### App Streamlit
+- `app_legacy.py`
+- `pages/01_Trazabilidad.py`
+- `pages/02_Dashboard.py`
+- `pages/03_Calidad.py`
+- `pages/04_Analitica.py`
+- `pages/05_Analitica_Mejorada.py`
 
-4. Los resultados (métricas y gráfico) se generarán en las últimas celdas.
+### Analítica
+- `src/train_model.py`
+- `src/train_model_improved.py`
 
----
-
-## 💻 Ejecución local
-
-### Requisitos previos
-
-- Python 3.8 o superior
-- pip (gestor de paquetes)
-
-### Pasos
-
-1. **Clonar el repositorio**:
+## Ejecución local
 
 ```bash
 git clone https://github.com/Pipoxsj/tfg-leplag-regresion-demo.git
 cd tfg-leplag-regresion-demo
-```
-
-2. **Crear entorno virtual** (opcional pero recomendado):
-
-```bash
+git checkout feature/capa-integracion-trazabilidad
 python -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
+venv\Scripts\activate
+pip install pandas duckdb streamlit scikit-learn matplotlib pillow joblib
 ```
 
-3. **Instalar dependencias**:
+### Construcción de la base del prototipo
 
 ```bash
-pip install -r requirements.txt
+python -m src.ingest.run_ingest
+python -m src.db.build_db_normalized
+python -m src.quality.run_quality
 ```
 
-4. **Ejecutar el script de entrenamiento**:
+### Ejecución del pipeline analítico mejorado
 
 ```bash
-python src/train_model.py
+python src/train_model_improved.py
 ```
 
-5. **Resultados**:
-   - Métricas impresas en consola.
-   - Gráfico guardado en `outputs/plot.png`.
-   - Métricas JSON en `outputs/metrics.json`.
+### Ejecución de la app
 
----
-
-## 📊 Outputs esperados
-
-Al ejecutar el pipeline, se generan:
-
-| Archivo                | Descripción                                                       |
-|------------------------|-------------------------------------------------------------------|
-| `outputs/metrics.json` | Métricas del modelo: MAE, RMSE, R² en formato JSON               |
-| `outputs/plot.png`     | Gráfico scatter: valores reales vs. predichos                     |
-
-**Ejemplo de métricas**:
-
-```json
-{
-  "MAE": 5432.18,
-  "RMSE": 7821.34,
-  "R2": 0.6789
-}
+```bash
+python -m streamlit run app_legacy.py
 ```
 
----
+## Qué muestra el prototipo
 
-## 🗂️ Estructura de datos
+La aplicación incluye cinco vistas principales:
 
-El dataset (`data/dataset_complementario_regresion_anonimizado-2.csv`) contiene las siguientes columnas:
+- **Inicio**: resumen general del prototipo
+- **Trazabilidad**: consulta detallada de servicios
+- **Dashboard**: indicadores operativos básicos
+- **Calidad**: hallazgos e inconsistencias detectadas
+- **Analítica**: métricas y artefactos del modelo predictivo
 
-| Columna                | Tipo         | Descripción                                      |
-|------------------------|--------------|--------------------------------------------------|
-| `id_cliente_anon`      | int          | ID anónimo del cliente                           |
-| `zona`                 | categórica   | Zona geográfica (RAWSON, DESCONOCIDA, etc.)      |
-| `tipo_cliente`         | categórica   | Residencial o Comercial/Industrial               |
-| `mes`                  | int          | Mes del año (1-12)                               |
-| `tipo_servicio`        | categórica   | Fumigación, Desinfección o Desratización         |
-| `superficie_m2`        | float        | Superficie tratada en m²                         |
-| `distancia_km`         | float        | Distancia al lugar del servicio (km)             |
-| `tecnico_id`           | int          | ID del técnico asignado                          |
-| `servicios_mes`        | int          | Cantidad de servicios prestados ese mes          |
-| `monto_mensual_ars`    | float        | **Variable objetivo**: monto facturado (ARS)     |
+## Componente analítico
 
----
-## 🎥 Video demo 
+El pipeline analítico reproduce una prueba de concepto de regresión lineal múltiple para estimar `monto_mensual_ars` a partir de variables operativas y contextuales.
+
+### Artefactos generados
+
+- `outputs/metrics.json`
+- `outputs/model_info.json`
+- `outputs/plot.png`
+- `outputs/predictions_sample.csv`
+- `outputs/model.joblib`
+
+### Estructura de datos
+
+El dataset `data/dataset_complementario_regresion_anonimizado-2.csv` contiene, entre otras, las siguientes variables:
+
+- `id_cliente_anon`
+- `zona`
+- `tipo_cliente`
+- `mes`
+- `tipo_servicio`
+- `superficie_m2`
+- `distancia_km`
+- `tecnico_id`
+- `servicios_mes`
+- `monto_mensual_ars`
+
+En la versión mejorada del pipeline:
+- `tecnico_id` se trata como variable categórica
+- se incorpora imputación explícita
+- se utiliza split agrupado por cliente cuando la columna está disponible
+- se compara el modelo contra un baseline simple
+
+## Video demo
 
 El video de demostración del prototipo está disponible en el siguiente enlace:
 
 👉 [Ver video demo](https://docs.google.com/videos/d/1nBcodtw41iR3uLrHqs6swiHNwT7i_c-rtLHMSomg0Bo/edit?usp=sharing)
 
----
+## Troubleshooting
 
-## 🔧 Troubleshooting
-
-### Error: `ModuleNotFoundError: No module named 'sklearn'`
-
-**Solución**: Instala las dependencias:
+### Error: `ModuleNotFoundError`
+Instala las dependencias necesarias en el entorno virtual:
 
 ```bash
-pip install -r requirements.txt
+pip install pandas duckdb streamlit scikit-learn matplotlib pillow joblib
 ```
 
----
-
-### Error: `FileNotFoundError: data/dataset_complementario_regresion_anonimizado-2.csv`
-
-**Solución**: Asegúrate de estar ejecutando el script desde la raíz del repositorio:
+### Error: `FileNotFoundError`
+Asegúrate de ejecutar los comandos desde la raíz del repositorio:
 
 ```bash
 cd tfg-leplag-regresion-demo
-python src/train_model.py
 ```
 
----
-
-### El gráfico no se muestra en entorno local
-
-**Solución**: El gráfico se guarda automáticamente en `outputs/plot.png`. Si quieres visualizarlo interactivamente, ejecuta el notebook en Jupyter:
+### La app no abre o localhost no responde
+Verifica que Streamlit esté corriendo:
 
 ```bash
-jupyter notebook notebooks/demo_regresion_leplag.ipynb
+python -m streamlit run app_legacy.py
 ```
 
----
+### No aparecen métricas o gráfico en la página Analítica
+Ejecuta primero el pipeline analítico mejorado:
 
-## ⚠️ Limitaciones
+```bash
+python src/train_model_improved.py
+```
 
-- **Modelo simple**: se utiliza regresión lineal múltiple sin feature engineering avanzado ni ajuste de hiperparámetros.
-- **Validación**: no se implementa validación cruzada (k-fold CV).
-- **Outliers**: no se aplica tratamiento explícito de outliers (se mantiene dataset original).
-- **Variables descartadas**: `id_cliente_anon` no se usa como feature (es identificador, no predictora).
-- **Generalización**: las métricas corresponden a un test set del 20% con split aleatorio (random_state=42).
+## Alcance y limitaciones
 
----
+Este MVP se valida en entorno local y no representa un despliegue productivo. Las fuentes utilizadas están sanitizadas y recortadas para fines de demostración. El componente analítico corresponde a una prueba de concepto y no a un servicio operativo en producción.
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto se distribuye bajo la licencia **MIT**. Ver archivo `LICENSE` para más detalles.
 
----
-
-## 👤 Autor
+## Autor
 
 **Ricardo Landa**  
-Trabajo Final de Grado - Diplomatura en Ciencia de Datos  
-Universidad Siglo 21 - 2025
+Trabajo Final de Grado  
+Universidad Siglo 21
 
----
-
-## 📧 Contacto
-
-Para consultas sobre el TFG o el repositorio, contactar vía GitHub Issues.
-
----
-
-## 🙏 Agradecimientos
+## Agradecimientos
 
 - Instituto Data Science Argentina
-- Leplag Fumigaciones (empresa caso de estudio)
-- Comunidad de scikit-learn y Python
+- Leplag Fumigaciones
+- Comunidad de Python y scikit-learn
